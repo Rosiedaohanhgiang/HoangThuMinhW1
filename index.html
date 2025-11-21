@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo Cáo Hành Trình Coaching - GM Hoàng Thu Minh</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Config Tailwind Theme -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        stone: {
+                            50: '#fafaf9',
+                            100: '#f5f5f4',
+                            200: '#e7e5e4',
+                            600: '#57534e',
+                            800: '#292524',
+                            900: '#1c1917',
+                        },
+                        teal: {
+                            50: '#f0fdfa',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                        },
+                        indigo: {
+                            50: '#eef2ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Smooth transition for tabs */
+        .tab-content {
+            animation: fadeEffect 0.5s;
+        }
+        @keyframes fadeEffect {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+        .analysis-box {
+            border-left-width: 4px;
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-900 min-h-screen pb-12">
+
+    <!-- Header Profile -->
+    <header class="bg-white shadow-sm border-b border-stone-200 sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-stone-900">Hồ Sơ Phát Triển Năng Lực Coach</h1>
+                <p class="text-stone-600 text-sm mt-1">Học viên: <span class="font-semibold text-teal-700">GM Hoàng Thu Minh</span> | Chức vụ: <span class="font-semibold">General Manager</span></p>
+            </div>
+            <div class="text-right hidden md:block">
+                <div class="text-xs text-stone-500 uppercase tracking-wider">Trạng thái</div>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                    Đang thực hành (Tuần 1)
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Navigation Tabs -->
+    <nav class="bg-white border-b border-stone-200">
+        <div class="max-w-5xl mx-auto px-4">
+            <div class="flex -mb-px space-x-8 overflow-x-auto">
+                <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn border-teal-500 text-teal-700 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+                    1. Tự Đánh Giá
+                </button>
+                <button onclick="switchTab('tab2')" id="btn-tab2" class="tab-btn border-transparent text-stone-500 hover:text-stone-700 hover:border-stone-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+                    2. Kế Hoạch 30 Ngày
+                </button>
+                <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn border-transparent text-stone-500 hover:text-stone-700 hover:border-stone-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+                    3. Check-in Tuần 1
+                </button>
+                <button onclick="switchTab('tab4')" id="btn-tab4" class="tab-btn border-transparent text-indigo-600 hover:text-indigo-800 hover:border-indigo-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+                    4. Phân tích & Lộ trình
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="max-w-5xl mx-auto px-4 py-8">
+
+        <!-- TAB 1: SELF ASSESSMENT -->
+        <div id="tab1" class="tab-content block">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Chart Section -->
+                <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-stone-100">
+                    <h3 class="text-lg font-semibold mb-4 text-stone-800">Biểu đồ Năng lực</h3>
+                    <div class="relative h-64 w-full">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                    <div class="mt-6 text-center">
+                        <p class="text-sm text-stone-500">Tổng điểm đánh giá</p>
+                        <p class="text-3xl font-bold text-teal-700">21/45</p>
+                        <p class="text-xs text-stone-400 mt-1">Mức độ: Dưới trung bình (Cần cải thiện gấp)</p>
+                    </div>
+                </div>
+
+                <!-- Analysis Section -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Quote -->
+                    <div class="bg-teal-50 border-l-4 border-teal-500 p-4 rounded-r-lg">
+                        <p class="text-sm text-teal-800 font-semibold uppercase tracking-wide mb-1">Kỹ năng tâm đắc nhất</p>
+                        <p class="text-lg italic text-stone-800">"Chủ động lắng nghe để hiểu nguyên nhân gốc rễ."</p>
+                    </div>
+
+                    <!-- AI Analysis Box -->
+                    <div class="analysis-box border-stone-800 bg-white p-6 shadow-sm rounded-r-lg border border-t-0 border-r-0 border-b-0">
+                        <h4 class="text-base font-bold text-stone-900 mb-2 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-stone-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                            Phân tích Chân dung Năng lực
+                        </h4>
+                        <div class="prose prose-stone text-sm text-stone-600">
+                            <p class="mb-2">
+                                Có một sự <strong class="text-stone-900">nghịch lý thú vị</strong> trong hồ sơ của chị Minh. Chị tự tin 3/5 ở khả năng "Lắng nghe tìm nguyên nhân" nhưng chỉ 2/5 ở "Đặt câu hỏi mở".
+                            </p>
+                            <p>
+                                Điều này cho thấy chị đang lắng nghe với tư duy của một <strong>Nhà quản lý chuyên gia (Expert Manager)</strong>: nghe để phân tích và tự tìm giải pháp, thay vì nghe để giúp nhân viên tự tư duy. Điểm yếu ở cả 4 kỹ năng GROW (2/5) và SBI (2/5) xác nhận rằng chị nắm vững lý thuyết nhưng hoàn toàn thiếu công cụ và sự an toàn tâm lý để thực hành trong thực tế.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Detail Toggle -->
+                    <div>
+                        <button onclick="toggleDetails()" class="flex items-center text-teal-700 font-medium hover:text-teal-800 text-sm transition-colors">
+                            <span>Xem chi tiết 9 tiêu chí đánh giá</span>
+                            <svg id="chevron" class="w-4 h-4 ml-1 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        
+                        <div id="detailTable" class="hidden mt-4 overflow-hidden rounded-lg border border-stone-200">
+                            <table class="min-w-full divide-y divide-stone-200">
+                                <thead class="bg-stone-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Nhóm Kỹ Năng</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Tiêu chí</th>
+                                        <th class="px-4 py-3 text-right text-xs font-medium text-stone-500 uppercase tracking-wider">Điểm</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-stone-200 text-sm">
+                                    <tr><td class="px-4 py-2 font-medium">Nền tảng</td><td>Lắng nghe hiểu gốc rễ</td><td class="px-4 py-2 text-right text-stone-900">3/5</td></tr>
+                                    <tr class="bg-red-50"><td class="px-4 py-2 font-medium text-red-800">Nền tảng</td><td class="text-red-800">Đặt câu hỏi mở, khơi gợi</td><td class="px-4 py-2 text-right font-bold text-red-700">2/5</td></tr>
+                                    <tr class="bg-red-50"><td class="px-4 py-2 font-medium text-red-800">Nền tảng</td><td class="text-red-800">Tạo không gian an toàn</td><td class="px-4 py-2 text-right font-bold text-red-700">2/5</td></tr>
+                                    <tr class="bg-red-50"><td class="px-4 py-2 font-medium text-red-800">GROW</td><td class="text-red-800">Sử dụng quy trình GROW</td><td class="px-4 py-2 text-right font-bold text-red-700">2/5</td></tr>
+                                    <tr class="bg-red-50"><td class="px-4 py-2 font-medium text-red-800">Phản hồi</td><td class="text-red-800">Mô hình SBI-D</td><td class="px-4 py-2 text-right font-bold text-red-700">2/5</td></tr>
+                                    <tr><td class="px-4 py-2 font-medium">Xử lý</td><td>Coach nhân viên ngại thay đổi</td><td class="px-4 py-2 text-right text-stone-900">3/5</td></tr>
+                                    <tr class="bg-red-50"><td class="px-4 py-2 font-medium text-red-800">Xử lý</td><td class="text-red-800">Khơi gợi lại động lực</td><td class="px-4 py-2 text-right font-bold text-red-700">2/5</td></tr>
+                                    <tr><td class="px-4 py-2 font-medium">Tác động</td><td>Thúc đẩy tinh thần chủ động</td><td class="px-4 py-2 text-right text-stone-900">3/5</td></tr>
+                                    <tr class="bg-red-50"><td class="px-4 py-2 font-medium text-red-800">Tác động</td><td class="text-red-800">Cải thiện chỉ số qua coach</td><td class="px-4 py-2 text-right font-bold text-red-700">2/5</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: 30-DAY PLAN -->
+        <div id="tab2" class="tab-content hidden">
+            <div class="max-w-3xl mx-auto space-y-8">
+                
+                <!-- Commitment Block -->
+                <div class="relative">
+                    <div class="absolute -top-4 -left-4 text-6xl text-stone-200 font-serif">“</div>
+                    <blockquote class="bg-white p-8 rounded-xl shadow-sm border border-stone-100 text-center">
+                        <h3 class="text-sm font-bold text-teal-600 uppercase tracking-wider mb-4">Cam kết hành động</h3>
+                        <p class="text-2xl font-medium text-stone-800 leading-relaxed">
+                            "Tôi cam kết sẽ lắng nghe nhiều hơn và hạn chế đưa ra lời khuyên ngay lập tức."
+                        </p>
+                    </blockquote>
+                </div>
+
+                <!-- Week 1 Action -->
+                <div class="bg-white p-6 rounded-xl border border-stone-200">
+                    <div class="flex justify-between items-start mb-4">
+                        <h4 class="text-lg font-semibold text-stone-900">Hành động Tuần 1</h4>
+                        <span class="bg-stone-100 text-stone-600 text-xs px-2 py-1 rounded">Đã thực hiện</span>
+                    </div>
+                    <p class="text-stone-600 italic">
+                        "Trong email trao đổi về việc xây dựng mục tiêu chất lượng, tôi đã thử hỏi: 'Theo em hệ thống quản lý chất lượng sẽ liên quan đến lĩnh vực nào mà HRGA đang quản lý?'"
+                    </p>
+                </div>
+
+                <!-- AI Analysis -->
+                <div class="analysis-box border-teal-500 bg-teal-50 p-6 rounded-r-lg">
+                    <h4 class="text-base font-bold text-teal-800 mb-2">Góc nhìn Mentor: Đánh giá Kế hoạch</h4>
+                    <div class="text-sm text-stone-700 space-y-2">
+                        <p>
+                            Mục tiêu "Lắng nghe nhiều hơn" là đúng hướng nhưng <strong>chưa đạt tiêu chí SMART</strong>. Nó quá chung chung và khó đo lường.
+                        </p>
+                        <p>
+                            Chính sự mơ hồ này dẫn đến hành động ở Tuần 1: Chị chọn thực hiện qua <strong>Email</strong>. Đây là một cơ chế phòng vệ. Email cho phép chị an toàn soạn thảo, tránh sự lúng túng khi phải im lặng lắng nghe trực tiếp. Tuy nhiên, coaching qua email thường thất bại vì nó thiếu sự kết nối cảm xúc và ngữ điệu - yếu tố cốt lõi của sự tin cậy.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: CHECK-IN -->
+        <div id="tab3" class="tab-content hidden">
+            
+            <!-- 3 Cards Layout -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Card 1 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-stone-400">
+                    <h4 class="text-xs font-bold text-stone-500 uppercase mb-2">Điều đã làm</h4>
+                    <p class="text-stone-800 font-medium">Thử đặt câu hỏi qua Email cho nhân viên về Quy trình Chất lượng.</p>
+                </div>
+                <!-- Card 2 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-orange-400">
+                    <h4 class="text-xs font-bold text-orange-600 uppercase mb-2">Bài học xương máu</h4>
+                    <p class="text-stone-800 font-medium">"Tôi không nên coach qua email :)"</p>
+                    <p class="text-sm text-stone-500 mt-2">Nhận ra sự thiếu hiệu quả khi thiếu tương tác trực tiếp.</p>
+                </div>
+                <!-- Card 3 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-teal-500">
+                    <h4 class="text-xs font-bold text-teal-600 uppercase mb-2">Cam kết tuần tới</h4>
+                    <p class="text-stone-800 font-medium">"Tôi sẽ thử coach trực tiếp."</p>
+                </div>
+            </div>
+
+            <!-- Analysis Box -->
+            <div class="analysis-box border-stone-800 bg-white p-6 shadow-sm rounded-r-lg border border-t-0 border-r-0 border-b-0 max-w-4xl mx-auto">
+                <h4 class="text-base font-bold text-stone-900 mb-2">Phân tích Check-in: Tín hiệu Tích cực</h4>
+                <div class="text-sm text-stone-600">
+                    <p>
+                        Dù hành động tuần đầu chưa thành công như mong đợi, nhưng tôi đánh giá rất cao <strong>Chỉ số Coachability (Khả năng học hỏi)</strong> của chị. 
+                    </p>
+                    <p class="mt-2">
+                        Chị đã nhận ra ngay lập tức rằng "Email là một ý tồi" và cam kết sửa sai ngay tuần sau. Đây là tư duy Growth Mindset cực kỳ quý giá. Vấn đề duy nhất còn lại là: Làm sao để chị cảm thấy "An toàn" khi coach trực tiếp? (Xem giải pháp ở Tab 4).
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: ANALYSIS & ROADMAP (INDIGO THEME) -->
+        <div id="tab4" class="tab-content hidden">
+            
+            <!-- Sub Navigation -->
+            <div class="flex space-x-2 mb-6 border-b border-indigo-100 pb-1">
+                <button onclick="switchSubTab('sub1')" id="btn-sub1" class="subtab-btn px-4 py-2 rounded-t-lg text-sm font-medium bg-indigo-50 text-indigo-700 border-b-2 border-indigo-600">
+                    1. Chẩn đoán Cốt lõi
+                </button>
+                <button onclick="switchSubTab('sub2')" id="btn-sub2" class="subtab-btn px-4 py-2 rounded-t-lg text-sm font-medium text-stone-500 hover:text-indigo-600 hover:bg-indigo-50 border-b-2 border-transparent">
+                    2. Công cụ & Kịch bản
+                </button>
+                <button onclick="switchSubTab('sub3')" id="btn-sub3" class="subtab-btn px-4 py-2 rounded-t-lg text-sm font-medium text-stone-500 hover:text-indigo-600 hover:bg-indigo-50 border-b-2 border-transparent">
+                    3. Lộ trình 4 Tuần
+                </button>
+            </div>
+
+            <!-- Sub Tab Content -->
+            <div class="bg-indigo-50/50 p-6 rounded-xl border border-indigo-100 min-h-[400px]">
+                
+                <!-- SUBTAB 1: DIAGNOSIS -->
+                <div id="sub1" class="sub-content block">
+                    <h3 class="text-xl font-bold text-indigo-900 mb-4">Nút thắt: Sự xung đột Bản sắc</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <div class="bg-white p-5 rounded-lg shadow-sm mb-4">
+                                <h4 class="font-bold text-stone-700 mb-2">Bản sắc GM (Hiện tại)</h4>
+                                <ul class="text-sm text-stone-600 space-y-2 list-disc list-inside">
+                                    <li>Được trả lương để có câu trả lời.</li>
+                                    <li>Giải quyết vấn đề nhanh chóng.</li>
+                                    <li>Kiểm soát tình huống.</li>
+                                    <li><strong>Hành vi:</strong> Đưa ra lời khuyên, chỉ đạo.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-white p-5 rounded-lg shadow-sm border-2 border-indigo-100">
+                                <h4 class="font-bold text-indigo-700 mb-2">Bản sắc Coach (Mục tiêu)</h4>
+                                <ul class="text-sm text-stone-600 space-y-2 list-disc list-inside">
+                                    <li>Giúp nhân viên tự tìm câu trả lời.</li>
+                                    <li>Chấp nhận sự chậm rãi để phát triển người khác.</li>
+                                    <li>Chấp nhận sự im lặng/lúng túng.</li>
+                                    <li><strong>Hành vi:</strong> Hỏi, Lắng nghe, Chờ đợi.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="prose prose-sm text-stone-700">
+                            <p class="font-medium text-indigo-800">Tại sao chị chọn Email?</p>
+                            <p>Email đóng vai trò là "Lá chắn an toàn". Nó giúp chị tránh phải đối mặt trực tiếp với sự lúng túng khi thực hành kỹ năng mới (đặt câu hỏi thay vì ra lệnh). Rào cản lớn nhất của chị không phải là kỹ năng, mà là <strong>An toàn tâm lý của chính bản thân chị</strong>.</p>
+                            <p class="mt-4 font-medium text-indigo-800">Giải pháp:</p>
+                            <p>Chị cần "Bình thường hóa sự lúng túng". Hãy bắt đầu buổi họp trực tiếp bằng cách nói: <em>"Chị đang tập kỹ năng coach nên có thể sẽ hỏi hơi nhiều và hơi chậm, em thông cảm nhé."</em> Câu nói này sẽ gỡ bỏ áp lực phải hoàn hảo ngay lập tức.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBTAB 2: TOOLS -->
+                <div id="sub2" class="sub-content hidden">
+                    <h3 class="text-xl font-bold text-indigo-900 mb-6">Bộ Công Cụ Chuyển Đổi Ngôn Ngữ (Kịch bản)</h3>
+                    
+                    <div class="overflow-hidden bg-white rounded-lg shadow-sm border border-stone-200 mb-6">
+                        <table class="min-w-full divide-y divide-stone-200">
+                            <thead class="bg-stone-800 text-white">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider w-1/2">Thay vì nói/hỏi (GM Style)</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider w-1/2 bg-indigo-700">Hãy thử hỏi (Coach Style)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-stone-200 text-sm">
+                                <tr>
+                                    <td class="px-6 py-4 text-stone-500">"Theo em hệ thống QLCL liên quan đến lĩnh vực nào?" <br><span class="text-xs italic text-red-500">(Câu hỏi kiểm tra bài cũ - Đóng)</span></td>
+                                    <td class="px-6 py-4 font-medium text-indigo-900">"Theo em, nếu áp dụng hệ thống mới này, công việc hàng ngày của team mình sẽ thay đổi như thế nào?" <br><span class="text-xs italic text-indigo-500">(Câu hỏi mở - Kích thích tư duy tác động)</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 text-stone-500">"Em nên làm thế này..." / "Giải pháp là..."</td>
+                                    <td class="px-6 py-4 font-medium text-indigo-900">"Em đã nghĩ đến những phương án nào rồi?" <br> "Còn cách nào khác nữa không?" <br> "Nếu không có rào cản nào, em sẽ muốn làm gì nhất?"</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 text-stone-500">"Tại sao em lại làm sai báo cáo này?"</td>
+                                    <td class="px-6 py-4 font-medium text-indigo-900">"Chị thấy báo cáo này đang khác với mong đợi. Điều gì đã gây khó khăn cho em trong quá trình làm nó?" <br><span class="text-xs italic text-indigo-500">(Dùng mô hình SBI thay vì phán xét)</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="bg-white p-4 rounded-lg border-l-4 border-indigo-600">
+                        <h4 class="font-bold text-indigo-800">Mẹo cho Tuần tới (Direct Coaching):</h4>
+                        <p class="text-sm text-stone-600 mt-1">Hãy áp dụng công thức <strong>"Chờ 3 giây"</strong>. Sau khi nhân viên trả lời, hãy đếm thầm 1-2-3 trước khi chị nói tiếp. Khoảng lặng này thường khuyến khích họ nói thêm những điều quan trọng nhất.</p>
+                    </div>
+                </div>
+
+                <!-- SUBTAB 3: ROADMAP -->
+                <div id="sub3" class="sub-content hidden">
+                    <div class="relative border-l-2 border-indigo-200 ml-3 space-y-8 pl-8 py-2">
+                        
+                        <!-- Week 1 -->
+                        <div class="relative">
+                            <span class="absolute -left-11 top-1 h-6 w-6 rounded-full bg-stone-400 border-2 border-white flex items-center justify-center text-white text-xs font-bold">✓</span>
+                            <h4 class="text-lg font-bold text-stone-500">Tuần 1: Nhận thức (Đã xong)</h4>
+                            <p class="text-sm text-stone-500">Đã thử nghiệm và thất bại với Email. Đã nhận ra bài học quan trọng về tương tác trực tiếp.</p>
+                        </div>
+
+                        <!-- Week 2 -->
+                        <div class="relative">
+                            <span class="absolute -left-11 top-1 h-6 w-6 rounded-full bg-indigo-600 border-4 border-indigo-100 shadow-sm flex items-center justify-center text-white text-xs font-bold">2</span>
+                            <h4 class="text-lg font-bold text-indigo-700">Tuần 2: Bình thường hóa & Lắng nghe (Hiện tại)</h4>
+                            <div class="bg-white p-4 rounded-lg shadow-sm mt-2 border border-indigo-100">
+                                <p class="text-sm font-semibold text-stone-800 mb-1">Mục tiêu:</p>
+                                <p class="text-sm text-stone-600">Thực hiện 01 buổi gặp trực tiếp (15 phút) mà không đưa ra lời khuyên nào.</p>
+                                <p class="text-sm font-semibold text-stone-800 mt-3 mb-1">Hành động:</p>
+                                <p class="text-sm text-stone-600">Mở đầu bằng lời tuyên bố: "Chị đang tập nghe". Dùng các câu hỏi trong Tab Công cụ.</p>
+                            </div>
+                        </div>
+
+                        <!-- Week 3 -->
+                        <div class="relative">
+                            <span class="absolute -left-11 top-1 h-6 w-6 rounded-full bg-white border-2 border-indigo-300 flex items-center justify-center text-indigo-500 text-xs font-bold">3</span>
+                            <h4 class="text-lg font-bold text-stone-800">Tuần 3: Áp dụng GROW (Bước G & R)</h4>
+                            <p class="text-sm text-stone-600 mt-1">Chỉ tập trung vào Goal (Mục tiêu) và Reality (Thực tại). Giúp nhân viên mô tả rõ vấn đề của họ thay vì nhảy vào giải quyết ngay.</p>
+                        </div>
+
+                        <!-- Week 4 -->
+                        <div class="relative">
+                            <span class="absolute -left-11 top-1 h-6 w-6 rounded-full bg-white border-2 border-indigo-300 flex items-center justify-center text-indigo-500 text-xs font-bold">4</span>
+                            <h4 class="text-lg font-bold text-stone-800">Tuần 4: Phản hồi SBI-D</h4>
+                            <p class="text-sm text-stone-600 mt-1">Thực hành đưa ra 01 phản hồi tích cực và 01 phản hồi điều chỉnh dựa trên hành vi cụ thể (Behavior) thay vì nhận xét chung chung.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- 1. TAB SWITCHING LOGIC ---
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('block'));
+            
+            // Show selected tab
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById(tabId).classList.add('block');
+
+            // Reset Button Styles
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-teal-500', 'text-teal-700', 'border-indigo-600', 'text-indigo-600');
+                btn.classList.add('border-transparent', 'text-stone-500');
+            });
+
+            // Active Button Style
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.remove('border-transparent', 'text-stone-500');
+            
+            if (tabId === 'tab4') {
+                activeBtn.classList.add('border-indigo-600', 'text-indigo-600');
+            } else {
+                activeBtn.classList.add('border-teal-500', 'text-teal-700');
+            }
+        }
+
+        // --- 2. SUB-TAB LOGIC (TAB 4) ---
+        function switchSubTab(subId) {
+            document.querySelectorAll('.sub-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.sub-content').forEach(el => el.classList.remove('block'));
+            
+            document.getElementById(subId).classList.remove('hidden');
+            document.getElementById(subId).classList.add('block');
+
+            document.querySelectorAll('.subtab-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-50', 'text-indigo-700', 'border-indigo-600');
+                btn.classList.add('text-stone-500', 'border-transparent');
+            });
+
+            const activeBtn = document.getElementById('btn-' + subId);
+            activeBtn.classList.remove('text-stone-500', 'border-transparent');
+            activeBtn.classList.add('bg-indigo-50', 'text-indigo-700', 'border-indigo-600');
+        }
+
+        // --- 3. TOGGLE DETAILS LOGIC ---
+        function toggleDetails() {
+            const table = document.getElementById('detailTable');
+            const chevron = document.getElementById('chevron');
+            
+            if (table.classList.contains('hidden')) {
+                table.classList.remove('hidden');
+                chevron.classList.add('rotate-180');
+            } else {
+                table.classList.add('hidden');
+                chevron.classList.remove('rotate-180');
+            }
+        }
+
+        // --- 4. CHART.JS CONFIGURATION ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            // Data based on input: 
+            // Foundation avg: ~2.3 (1.1=3, 1.2=2, 1.3=2)
+            // GROW avg: 2.0 (2.1=2, 2.2=2)
+            // SBI/Motivation avg: 2.5 (3.1=3, 3.2=2)
+            // Impact avg: 2.5 (4.1=3, 4.2=2)
+            
+            const data = {
+                labels: ['Nền tảng (Lắng nghe/Hỏi)', 'Quy trình GROW', 'Phản hồi & Động lực', 'Tạo tác động'],
+                datasets: [{
+                    label: 'Điểm Tự Đánh Giá',
+                    data: [2.3, 2.0, 2.5, 2.5],
+                    fill: true,
+                    backgroundColor: 'rgba(20, 184, 166, 0.2)', // Teal-500 with opacity
+                    borderColor: 'rgb(20, 184, 166)', // Teal-500
+                    pointBackgroundColor: 'rgb(13, 148, 136)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(20, 184, 166)'
+                }]
+            };
+
+            const config = {
+                type: 'radar',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                color: '#e7e5e4' // stone-200
+                            },
+                            grid: {
+                                color: '#e7e5e4'
+                            },
+                            pointLabels: {
+                                font: {
+                                    family: 'Inter',
+                                    size: 11,
+                                    weight: '600'
+                                },
+                                color: '#44403c' // stone-700
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 5,
+                            ticks: {
+                                stepSize: 1,
+                                backdropColor: 'transparent'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            };
+
+            new Chart(ctx, config);
+        });
+    </script>
+</body>
+</html>
